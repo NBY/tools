@@ -391,31 +391,31 @@ EOF
 	echo "successful!";
     exit;
 elif [ "$selected" == 'addxxx' ]; then
+	unset sdomain
 	unset domain
+	echo "input second domain";
+	read sdomain
     echo "input domain";
 	read domain
-	unset sdomain
-	echo "input second domain [need add . at end]";
-	read sdomain
-	useradd -m -s /sbin/nologin $sdomain$domain;
-	usermod -G nginx $sdomain$domain
-	mkdir -p /home/$sdomain$domain/www;
-	mkdir -p /home/$sdomain$domain/log;
-	mkdir -p /home/$sdomain$domain/tmp/session;
-	chown -R nginx:nginx /home/$sdomain$domain
-    cat > /etc/nginx/conf.d/$sdomain$domain.conf <<EOF
+	useradd -m -s /sbin/nologin $sdomain.$domain;
+	usermod -G nginx $sdomain.$domain
+	mkdir -p /home/$sdomain.$domain/www;
+	mkdir -p /home/$sdomain.$domain/log;
+	mkdir -p /home/$sdomain.$domain/tmp/session;
+	chown -R nginx:nginx /home/$sdomain.$domain
+    cat > /etc/nginx/conf.d/$sdomain.$domain.conf <<EOF
 server {
  listen 80;
- server_name $sdomain$domain;
- access_log /home/$sdomain$domain/log/access.log;
- error_log /home/$sdomain$domain/log/error.log;
- root /home/$sdomain$domain/www;
+ server_name $sdomain.$domain;
+ access_log /home/$sdomain.$domain/log/access.log;
+ error_log /home/$sdomain.$domain/log/error.log;
+ root /home/$sdomain.$domain/www;
  index index.php index.html index.htm;
  location = /favicon.ico {
  log_not_found off;
  access_log off;
  }
- #include /home/$sdomain$domain/rewrite.conf;
+ #include /home/$sdomain.$domain/rewrite.conf;
  location = /robots.txt {
  allow all;
  log_not_found off;
@@ -435,7 +435,7 @@ server {
  #
  location ~ \.php\$ { 
  try_files \$uri =404;
- fastcgi_pass unix:/var/run/php-fpm/$sdomain$domain.sock;
+ fastcgi_pass unix:/var/run/php-fpm/$sdomain.$domain.sock;
  fastcgi_index index.php;
  fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
  include fastcgi_params;
@@ -454,18 +454,18 @@ server {
  location ~* \.(gif|jpg|jpeg|png|bmp|txt|zip|jar|swf)\$ {
  expires 30d;
  access_log off; 
- valid_referers none blocked *.$sdomain$domain  server_names ~\.google\. ~\.baidu\. ~\.bing\. ~\.yahoo\. ~\.soso\. ~\.sogou\. ~\.alexa\. ~\.haosou\. ~\.youdao\.;
+ valid_referers none blocked *.$sdomain.$domain  server_names ~\.google\. ~\.baidu\. ~\.bing\. ~\.yahoo\. ~\.soso\. ~\.sogou\. ~\.alexa\. ~\.haosou\. ~\.youdao\.;
  if (\$invalid_referer) {
  #return 403;
- rewrite ^/ http://www.$domain/403.png;
+ rewrite ^/ http://$sdomain.$domain/403.png;
   }
  }
  rewrite ^/sitemap.xml\$ /sitemap.php last;
 }
 EOF
-    cat > /etc/php-fpm.d/$sdomain$domain.conf <<EOF
-[$sdomain$domain]
-listen = /var/run/php-fpm/$sdomain$domain.sock
+    cat > /etc/php-fpm.d/$sdomain.$domain.conf <<EOF
+[$sdomain.$domain]
+listen = /var/run/php-fpm/$sdomain.$domain.sock
 listen.allowed_clients = 127.0.0.1
 listen.owner = nginx
 listen.group = nginx
@@ -483,12 +483,12 @@ pm.max_spare_servers = 35
 chdir = /
 slowlog = /var/log/php-fpm/www-slow.log
 php_value[session.save_handler] = files
-php_value[session.save_path] = /home/$sdomain$domain/tmp/session
-php_admin_value[open_basedir] = /home/$sdomain$domain/www:/home/$sdomain$domain/tmp:/usr/share/php:/tmp
-php_admin_value[upload_tmp_dir] = /home/$sdomain$domain/tmp
+php_value[session.save_path] = /home/$sdomain.$domain/tmp/session
+php_admin_value[open_basedir] = /home/$sdomain.$domain/www:/home/$sdomain.$domain/tmp:/usr/share/php:/tmp
+php_admin_value[upload_tmp_dir] = /home/$sdomain.$domain/tmp
 EOF
-#    cat > /etc/logrotate.d/$sdomain$domain <<EOF
-#/data/$sdomain$domain/log/*.log {
+#cat > /etc/logrotate.d/$sdomain.$domain <<EOF
+#/data/$sdomain.$domain/log/*.log {
 #daily
 #missingok
 #rotate 7
@@ -509,10 +509,10 @@ EOF
 	echo "successful!";
     exit;
 elif [ "$selected" == 'del' ]; then
-    echo "input domain";
-	read domain
-	echo "input second domain [need add . at end]";
+	echo "input second domain and at end add '.'(if doesn't have,press enter)";
 	read sdomain
+        echo "input domain";
+	read domain
 	rm /etc/nginx/conf.d/$sdomain$domain.conf
 	tar zcvf /home/bakdel$sdomain$domain.tar.gz /home/www/$sdomain$domain
 	rm /home/www/$sdomain$domain -rf
