@@ -1,0 +1,410 @@
+#!/bin/bash
+# Sanity check
+[ $(id -g) != "0" ] && die "Script must be run as root.";
+echo -e "\033[46m Vhost Manage \033[0m"
+echo -e "\033[46m1.add www domain\n2.add second domain\n3.add second domain web access\n4.delete website\n5.exit \033[0m"
+select selected in 'addwww' 'addxxx' 'addpw' 'del' 'exit'; do
+break;
+done;
+if [ "$selected" == 'addwww' ]; then
+	unset domain
+    echo "input domain";
+	read domain
+	useradd -m -s /sbin/nologin $domain;
+	usermod -G nginx $domain
+	mkdir -p /home/$domain/www;
+	mkdir -p /home/$domain/log;
+	mkdir -p /home/$domain/tmp/session;
+	chown -R nginx:nginx /home/$domain
+    cat > /etc/nginx/conf.d/$domain.conf <<EOF
+server {
+ listen 80;
+ server_name www.$domain;
+ access_log /home/$domain/log/access.log;
+ error_log /home/$domain/log/error.log;
+ root /home/$domain/www;
+ index index.php index.html index.htm;
+ location = /favicon.ico {
+ log_not_found off;
+ access_log off;
+ }
+ #include /home/$domain/rewrite.conf;
+ location = /robots.txt {
+ allow all;
+ log_not_found off;
+ access_log off;
+ }
+
+ #error_page 404 /404.html;
+
+ # redirect server error pages to the static page /50x.html
+ #
+ error_page 500 502 503 504 /50x.html;
+ location = /50x.html {
+ root /usr/share/nginx/html;
+ }
+
+ # pass the PHP scripts to FastCGI server listening on sock
+ #
+ location ~ \.php\$ { 
+ try_files \$uri =404;
+ fastcgi_pass unix:/var/run/php-fpm/$domain.sock;
+ fastcgi_index index.php;
+ fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+ fastcgi_param PHP_ADMIN_VALUE "open_basedir=\$document_root/:/tmp/:/proc/";
+ include fastcgi_params;
+ }
+ 
+ # Deny all attempts to access hidden files such as .htaccess
+ # Deny access to any files with a .php extension in the uploads directory
+ #
+ location ~ /\. {
+ deny all;
+ }
+ location ~* /(?:uploads|files|data|upload)/.*\.php\$ {
+ deny all;
+ }
+ 
+ location ~* \.(gif|jpg|jpeg|png|bmp|txt|zip|jar|swf)\$ {
+ expires 30d;
+ access_log off; 
+ valid_referers none blocked *.$domain  server_names ~\.google\. ~\.baidu\. ~\.bing\. ~\.yahoo\. ~\.soso\. ~\.sogou\. ~\.alexa\. ~\.haosou\. ~\.youdao\.;
+ if (\$invalid_referer) {
+ #return 403;
+ rewrite ^/ http://www.$domain/403.png;
+  }
+ }
+ rewrite ^/sitemap.xml\$ /sitemap.php last;
+}
+
+server {
+	server_name $domain;
+	rewrite ^/(.*)\$ http://www.\$host/$1 permanent;
+	}
+EOF
+    cat > /etc/php-fpm.d/$domain.conf <<EOF
+[$domain]
+listen = /var/run/php-fpm/$domain.sock
+listen.allowed_clients = 127.0.0.1
+listen.owner = nginx
+listen.group = nginx
+listen.mode = 0660
+
+user = nginx
+group = nginx
+
+pm = dynamic
+pm.max_children = 50
+pm.start_servers = 5
+pm.min_spare_servers = 5
+pm.max_spare_servers = 35
+
+chdir = /
+slowlog = /var/log/php-fpm/www-slow.log
+php_value[session.save_handler] = files
+php_value[session.save_path] = /home/$domain/tmp/session
+php_admin_value[open_basedir] = /home/$domain/www:/home/$domain/tmp:/usr/share/php:/tmp
+php_admin_value[upload_tmp_dir] = /home/$domain/tmp
+EOF
+#    cat > /etc/logrotate.d/$domain <<EOF
+#/data/$domain/log/*.log {
+#daily
+#missingok
+#rotate 7
+#compress
+#delaycompress
+#notifempty
+#create 640 nginx adm
+#sharedscripts
+#postrotate
+# [ -f /var/run/nginx.pid ] && kill -USR1 `cat /var/run/nginx.pid`
+#endscript
+#}
+#EOF
+	sed -i "\$a [HOST=$domain]" /etc/php.ini
+	sed -i "\$a open_basedir=/home/$domain/:/proc/:/tmp/" /etc/php.ini
+	sed -i "\$a [PATH=/home/$domain/]" /etc/php.ini
+	sed -i "\$a open_basedir=/home/$domain/:/proc/:/tmp/" /etc/php.ini
+	nginx -t
+    systemctl restart nginx
+    systemctl restart php-fpm
+    systemctl status nginx
+    systemctl status php-fpm
+	echo "successful!";
+    exit;
+elif [ "$selected" == 'addxxx' ]; then
+	unset sdomain
+	unset domain
+	echo "input second domain";
+	read sdomain
+    echo "input domain";
+	read domain
+	useradd -m -s /sbin/nologin $sdomain.$domain;
+	usermod -G nginx $sdomain.$domain
+	mkdir -p /home/$sdomain.$domain/www;
+	mkdir -p /home/$sdomain.$domain/log;
+	mkdir -p /home/$sdomain.$domain/tmp/session;
+	chown -R nginx:nginx /home/$sdomain.$domain
+    cat > /etc/nginx/conf.d/$sdomain.$domain.conf <<EOF
+server {
+ listen 80;
+ server_name $sdomain.$domain;
+ access_log /home/$sdomain.$domain/log/access.log;
+ error_log /home/$sdomain.$domain/log/error.log;
+ root /home/$sdomain.$domain/www;
+ index index.php index.html index.htm;
+ location = /favicon.ico {
+ log_not_found off;
+ access_log off;
+ }
+ #include /home/$sdomain.$domain/rewrite.conf;
+ location = /robots.txt {
+ allow all;
+ log_not_found off;
+ access_log off;
+ }
+
+ #error_page 404 /404.html;
+
+ # redirect server error pages to the static page /50x.html
+ #
+ error_page 500 502 503 504 /50x.html;
+ location = /50x.html {
+ root /usr/share/nginx/html;
+ }
+
+ # pass the PHP scripts to FastCGI server listening on sock
+ #
+ location ~ \.php\$ { 
+ try_files \$uri =404;
+ fastcgi_pass unix:/var/run/php-fpm/$sdomain.$domain.sock;
+ fastcgi_index index.php;
+ fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+ fastcgi_param PHP_ADMIN_VALUE "open_basedir=\$document_root/:/tmp/:/proc/";
+ include fastcgi_params;
+ }
+ 
+ # Deny all attempts to access hidden files such as .htaccess
+ # Deny access to any files with a .php extension in the uploads directory
+ #
+ location ~ /\. {
+ deny all;
+ }
+ location ~* /(?:uploads|files|data|upload)/.*\.php\$ {
+ deny all;
+ }
+ 
+ location ~* \.(gif|jpg|jpeg|png|bmp|txt|zip|jar|swf)\$ {
+ expires 30d;
+ access_log off; 
+ valid_referers none blocked *.$sdomain.$domain  server_names ~\.google\. ~\.baidu\. ~\.bing\. ~\.yahoo\. ~\.soso\. ~\.sogou\. ~\.alexa\. ~\.haosou\. ~\.youdao\.;
+ if (\$invalid_referer) {
+ #return 403;
+ rewrite ^/ http://$sdomain.$domain/403.png;
+  }
+ }
+ rewrite ^/sitemap.xml\$ /sitemap.php last;
+}
+EOF
+    cat > /etc/php-fpm.d/$sdomain.$domain.conf <<EOF
+[$sdomain.$domain]
+listen = /var/run/php-fpm/$sdomain.$domain.sock
+listen.allowed_clients = 127.0.0.1
+listen.owner = nginx
+listen.group = nginx
+listen.mode = 0660
+
+user = nginx
+group = nginx
+
+pm = dynamic
+pm.max_children = 50
+pm.start_servers = 5
+pm.min_spare_servers = 5
+pm.max_spare_servers = 35
+
+chdir = /
+slowlog = /var/log/php-fpm/www-slow.log
+php_value[session.save_handler] = files
+php_value[session.save_path] = /home/$sdomain.$domain/tmp/session
+php_admin_value[open_basedir] = /home/$sdomain.$domain/www:/home/$sdomain.$domain/tmp:/usr/share/php:/tmp
+php_admin_value[upload_tmp_dir] = /home/$sdomain.$domain/tmp
+EOF
+#    cat > /etc/logrotate.d/$sdomain$domain <<EOF
+#/data/$sdomain$domain/log/*.log {
+#daily
+#missingok
+#rotate 7
+#compress
+#delaycompress
+#notifempty
+#create 640 nginx adm
+#sharedscripts
+#postrotate
+# [ -f /var/run/nginx.pid ] && kill -USR1 `cat /var/run/nginx.pid`
+#endscript
+#}
+#EOF
+	sed -i "\$a [HOST=$sdomain.$domain]" /etc/php.ini
+	sed -i "\$a open_basedir=/home/$sdomain.$domain/:/proc/:/tmp/" /etc/php.ini
+	sed -i "\$a [PATH=/home/$sdomain.$domain/]" /etc/php.ini
+	sed -i "\$a open_basedir=/home/$sdomain.$domain/:/proc/:/tmp/" /etc/php.ini
+    systemctl restart nginx
+	systemctl restart php-fpm
+	systemctl status nginx
+	systemctl status php-fpm
+	echo "successful!";
+    exit;
+elif [ "$selected" == 'addpw' ]; then
+    unset sdomain
+	unset domain
+	unset accessuser
+	unset accesspass
+	echo "input second domain";
+	read sdomain
+    echo "input domain";
+	read domain
+	echo "input Access Username";
+	read accessuser
+    echo "input Access Password";
+	read accesspass
+	useradd -m -s /sbin/nologin $sdomain.$domain;
+	usermod -G nginx $sdomain.$domain
+	mkdir -p /home/$sdomain.$domain/www;
+	mkdir -p /home/$sdomain.$domain/log;
+	mkdir -p /home/$sdomain.$domain/tmp/session;
+	chown -R nginx:nginx /home/$sdomain.$domain
+	htpasswd -bc /home/$sdomain.$domain/htpasswd $accessuser $accesspass
+    cat > /etc/nginx/conf.d/$sdomain.$domain.conf <<EOF
+server {
+ listen 80;
+ server_name $sdomain.$domain;
+ access_log /home/$sdomain.$domain/log/access.log;
+ error_log /home/$sdomain.$domain/log/error.log;
+ root /home/$sdomain.$domain/www;
+ index index.php index.html index.htm;
+ location = /favicon.ico {
+ log_not_found off;
+ access_log off;
+ }
+ #include /home/$sdomain.$domain/rewrite.conf;
+ location = /robots.txt {
+ allow all;
+ log_not_found off;
+ access_log off;
+ }
+
+ #error_page 404 /404.html;
+
+ # redirect server error pages to the static page /50x.html
+ #
+ error_page 500 502 503 504 /50x.html;
+ location = /50x.html {
+ root /usr/share/nginx/html;
+ }
+
+  location ^~ / {
+  location ~ \.php$ {
+ fastcgi_pass unix:/var/run/php-fpm/$sdomain.$domain.sock;
+ fastcgi_index index.php;
+ fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+ include fastcgi_params;
+  }
+ auth_basic "Access Identify";
+ auth_basic_user_file /home/$sdomain.$domain/htpasswd;
+ }
+
+ 
+ # pass the PHP scripts to FastCGI server listening on sock
+ #
+ location ~ \.php\$ { 
+ try_files \$uri =404;
+ fastcgi_pass unix:/var/run/php-fpm/$sdomain.$domain.sock;
+ fastcgi_index index.php;
+ fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+ include fastcgi_params;
+ }
+ 
+ # Deny all attempts to access hidden files such as .htaccess
+ # Deny access to any files with a .php extension in the uploads directory
+ #
+ location ~ /\. {
+ deny all;
+ }
+ location ~* /(?:uploads|files|data|upload)/.*\.php\$ {
+ deny all;
+ }
+ 
+ location ~* \.(gif|jpg|jpeg|png|bmp|txt|zip|jar|swf)\$ {
+ expires 30d;
+ access_log off; 
+ valid_referers none blocked *.$sdomain.$domain  server_names ~\.google\. ~\.baidu\. ~\.bing\. ~\.yahoo\. ~\.soso\. ~\.sogou\. ~\.alexa\. ~\.haosou\. ~\.youdao\.;
+ if (\$invalid_referer) {
+ #return 403;
+ rewrite ^/ http://$sdomain.$domain/403.png;
+  }
+ }
+ rewrite ^/sitemap.xml\$ /sitemap.php last;
+}
+EOF
+    cat > /etc/php-fpm.d/$sdomain.$domain.conf <<EOF
+[$sdomain.$domain]
+listen = /var/run/php-fpm/$sdomain.$domain.sock
+listen.allowed_clients = 127.0.0.1
+listen.owner = nginx
+listen.group = nginx
+listen.mode = 0660
+
+user = nginx
+group = nginx
+
+pm = dynamic
+pm.max_children = 50
+pm.start_servers = 5
+pm.min_spare_servers = 5
+pm.max_spare_servers = 35
+
+chdir = /
+slowlog = /var/log/php-fpm/www-slow.log
+php_value[session.save_handler] = files
+php_value[session.save_path] = /home/$sdomain.$domain/tmp/session
+php_admin_value[open_basedir] = /home/$sdomain.$domain/www:/home/$sdomain.$domain/tmp:/usr/share/php:/tmp
+php_admin_value[upload_tmp_dir] = /home/$sdomain.$domain/tmp
+EOF
+#    cat > /etc/logrotate.d/$sdomain$domain <<EOF
+#/data/$sdomain$domain/log/*.log {
+#daily
+#missingok
+#rotate 7
+#compress
+#delaycompress
+#notifempty
+#create 640 nginx adm
+#sharedscripts
+#postrotate
+# [ -f /var/run/nginx.pid ] && kill -USR1 `cat /var/run/nginx.pid`
+#endscript
+#}
+#EOF
+	sed -i "\$a [HOST=$sdomain.$domain]" /etc/php.ini
+	sed -i "\$a open_basedir=/home/$sdomain.$domain/:/proc/:/tmp/" /etc/php.ini
+	sed -i "\$a [PATH=/home/$sdomain.$domain/]" /etc/php.ini
+	sed -i "\$a open_basedir=/home/$sdomain.$domain/:/proc/:/tmp/" /etc/php.ini
+    systemctl restart nginx
+	systemctl restart php-fpm
+	systemctl status nginx
+	systemctl status php-fpm
+	echo "successful!";
+    exit;
+elif [ "$selected" == 'del' ]; then
+    echo "input domain";
+	read domain
+	echo "input second domain [need add . at end]";
+	read sdomain
+	rm /etc/nginx/conf.d/$sdomain$domain.conf
+	tar zcvf /home/bakdel$sdomain$domain.tar.gz /home/www/$sdomain$domain
+	rm /home/www/$sdomain$domain -rf
+    exit;
+elif [ "$selected" == 'exit' ]; then
+    exit;
+fi;
