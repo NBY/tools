@@ -108,6 +108,11 @@ yum install -y nginx mysql-community-server php php-opcache php-pecl-apcu php-de
 sed -i '4a return 500;' /etc/nginx/conf.d/default.conf
 sed -i "/^return/ s/^/    / " /etc/nginx/conf.d/default.conf
 sed -i '23a server_tokens off;' /etc/nginx/nginx.conf
+sed -i '23a fastcgi_connect_timeout 300;' /etc/nginx/nginx.conf
+sed -i '23a fastcgi_send_timeout 300;' /etc/nginx/nginx.conf
+sed -i '23a fastcgi_read_timeout 300;' /etc/nginx/nginx.conf
+sed -i '23a fastcgi_buffer_size 64k;' /etc/nginx/nginx.conf
+sed -i '23a fastcgi_buffers 4 64k;' /etc/nginx/nginx.conf
 sed -i "/^server_tokens/ s/^/    / " /etc/nginx/nginx.conf
 sed -i 's:#gzip  on;:gzip  on;:g' /etc/nginx/nginx.conf
 sed -i 's:short_open_tag = Off:short_open_tag = On:g' /etc/php.ini
