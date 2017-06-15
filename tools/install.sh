@@ -48,6 +48,7 @@ sed -i 's:;cgi.fix_pathinfo=1:cgi.fix_pathinfo=0:g' /etc/php.ini
 sed -i 's:;date.timezone =:date.timezone = "Asia/Hong_Kong":g' /etc/php.ini
 sed -i 's:; max_input_vars = 1000:max_input_vars = 10000:g' /etc/php.ini
 sed -i 's@;open_basedir =@open_basedir = /data/wwwroot/:/tmp/:/proc/@g' /etc/php.ini
+sed -i 's:pdo_mysql.default_socket=:pdo_mysql.default_socket=/home/mysql/mysql.sock:g' /etc/php.ini
 sed -i 's@listen = 127.0.0.1:9000@listen = /var/run/php-fpm/php-fpm.sock@g' /etc/php-fpm.d/www.conf
 sed -i 's:user = apache:user = nginx:g' /etc/php-fpm.d/www.conf
 sed -i 's:group = apache:group = nginx:g' /etc/php-fpm.d/www.conf
