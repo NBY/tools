@@ -25,82 +25,9 @@ rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
 rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
 rpm -Uvh http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
 rm /etc/yum.repos.d/remi.repo -f
-cat > /etc/yum.repos.d/remi.repo <<"EOF"
-# Repository: http://rpms.remirepo.net/
-# Blog:       http://blog.remirepo.net/
-# Forum:      http://forum.remirepo.net/
 
-[remi]
-name=Remi's RPM repository for Enterprise Linux 7 - $basearch
-#baseurl=http://rpms.remirepo.net/enterprise/7/remi/$basearch/
-#mirrorlist=https://rpms.remirepo.net/enterprise/7/remi/httpsmirror
-mirrorlist=http://rpms.remirepo.net/enterprise/7/remi/mirror
-enabled=1
-gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
+wget -P /etc/yum.repos.d/ https://raw.githubusercontent.com/NBY/tools/master/tools/remi.repo 
 
-[remi-php55]
-name=Remi's PHP 5.5 RPM repository for Enterprise Linux 7 - $basearch
-#baseurl=http://rpms.remirepo.net/enterprise/7/php55/$basearch/
-#mirrorlist=https://rpms.remirepo.net/enterprise/7/php55/httpsmirror
-mirrorlist=http://rpms.remirepo.net/enterprise/7/php55/mirror
-# NOTICE: common dependencies are in "remi-safe"
-enabled=0
-gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
-
-[remi-php56]
-name=Remi's PHP 5.6 RPM repository for Enterprise Linux 7 - $basearch
-#baseurl=http://rpms.remirepo.net/enterprise/7/php56/$basearch/
-#mirrorlist=https://rpms.remirepo.net/enterprise/7/php56/httpsmirror
-mirrorlist=http://rpms.remirepo.net/enterprise/7/php56/mirror
-# NOTICE: common dependencies are in "remi-safe"
-enabled=1
-gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
-
-[remi-test]
-name=Remi's test RPM repository for Enterprise Linux 7 - $basearch
-#baseurl=http://rpms.remirepo.net/enterprise/7/test/$basearch/
-name=Remi's test RPM repository for Enterprise Linux 7 - $basearch
-#baseurl=http://rpms.remirepo.net/enterprise/7/test/$basearch/
-#mirrorlist=https://rpms.remirepo.net/enterprise/7/test/mirror
-mirrorlist=http://rpms.remirepo.net/enterprise/7/test/mirror
-# WARNING: If you enable this repository, you must also enable "remi"
-enabled=0
-gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
-
-[remi-debuginfo]
-name=Remi's RPM repository for Enterprise Linux 7 - $basearch - debuginfo
-baseurl=http://rpms.remirepo.net/enterprise/7/debug-remi/$basearch/
-enabled=0
-gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
-
-[remi-php55-debuginfo]
-name=Remi's PHP 5.5 RPM repository for Enterprise Linux 7 - $basearch - debuginfo
-baseurl=http://rpms.remirepo.net/enterprise/7/debug-php55/$basearch/
-enabled=0
-gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
-
-[remi-php56-debuginfo]
-name=Remi's PHP 5.6 RPM repository for Enterprise Linux 7 - $basearch - debuginfo
-baseurl=http://rpms.remirepo.net/enterprise/7/debug-php56/$basearch/
-enabled=0
-gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
-
-[remi-test-debuginfo]
-name=Remi's test RPM repository for Enterprise Linux 7 - $basearch - debuginfo
-baseurl=http://rpms.remirepo.net/enterprise/7/debug-test/$basearch/
-enabled=0
-gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
-gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
-EOF
 yum clean all
 yum makecache
 echo -e "\033[46m [Notice] install service \033[0m"
@@ -153,23 +80,9 @@ sed -i 's:inet_protocols = all:inet_protocols = ipv4:g' /etc/postfix/main.cf
 sed -i 's:mydestination =:#mydestination =:g' /etc/postfix/main.cf
 sed -i 's:#relay_domains = $mydestination:relay_domains = $mydomain:g' /etc/postfix/main.cf
 sed -i 's:#myorigin = $mydomain:myorigin = $mydomain:g' /etc/postfix/main.cf
-cat > /etc/opendkim.conf<<"EOF"
-UserID                  opendkim:opendkim
-UMask                   022
-Mode                    sv
-PidFile                 /var/run/opendkim/opendkim.pid
-Canonicalization        relaxed/relaxed
-TemporaryDirectory      /var/tmp
-ExternalIgnoreList      refile:/etc/opendkim/TrustedHosts
-InternalHosts           refile:/etc/opendkim/TrustedHosts
-KeyTable                refile:/etc/opendkim/KeyTable
-SigningTable            refile:/etc/opendkim/SigningTable
-MinimumKeyBits          1024
-Socket                  inet:8891@127.0.0.1
-LogWhy                  Yes
-Syslog                  Yes
-SyslogSuccess           Yes
-EOF
+
+wget -P /etc/ https://raw.githubusercontent.com/NBY/tools/master/tools/opendkim.conf
+
 mkdir -p /etc/opendkim/keys/`hostname -f`
 opendkim-genkey -D /etc/opendkim/keys/`hostname -f`/ -d `hostname -f` -s default
 chown opendkim:opendkim -R /etc/opendkim/
