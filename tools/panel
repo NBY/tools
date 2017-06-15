@@ -1,0 +1,33 @@
+#!/bin/bash
+# Sanity check
+[ $(id -g) != "0" ] && die "Script must be run as root.";
+echo -e "\033[46m Nginx PHP Mail Manage \033[0m"
+echo -e "\033[46m1.restart nginx&php-fpm\n2.check nginx&php-fpm status\n3.restart postfix&opendkim\n4.check postfix&opendkim \033[0m"
+select selected in 'rnp' 'cnp' 'rpo' 'cpo'; do
+break;
+done;
+
+
+if [ "$selected" == 'rnp' ]; then
+  systemctl restart nginx
+  systemctl restart php-fpm
+  systemctl status nginx
+  systemctl status php-fpm
+  chown -R nginx:nginx /var/run/php-fpm/
+  chown -R nginx:nginx /var/lib/php/session/
+  exit;
+elif [ "$selected" == 'cnp' ]; then
+  systemctl status nginx
+  systemctl status php-fpm
+  exit;
+elif [ "$selected" == 'rpo' ]; then
+  systemctl restart postfix
+  systemctl restart opendkim
+  systemctl status postfix
+  systemctl status opendkim
+  exit;
+elif [ "$selected" == 'cpo' ]; then
+  systemctl status postfix
+  systemctl status opendkim
+  exit;
+fi;
