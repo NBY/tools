@@ -196,43 +196,10 @@ systemctl start opendkim
 cp /etc/opendkim/keys/`hostname -f`/default.txt /root/`hostname -f`-dkim-signature_default.txt
 echo -e "\033[46m open '/root/`hostname -f`-dkim-signature_default.txt', then add the TXT record to you DNS resolution system. \033[0m"
 echo -e "\033[46m [Notice] install postfix opendkim successful \033[0m"
-cat > /usr/sbin/panel<<"EOF"
-#!/bin/bash
-# Sanity check
-[ $(id -g) != "0" ] && die "Script must be run as root.";
-echo -e "\033[46m Nginx PHP Mail Manage \033[0m"
-echo -e "\033[46m1.restart nginx&php-fpm\n2.check nginx&php-fpm status\n3.restart postfix&opendkim\n4.check postfix&opendkim \033[0m"
-select selected in 'rnp' 'cnp' 'rpo' 'cpo'; do
-break;
-done;
 
-
-if [ "$selected" == 'rnp' ]; then
-  systemctl restart nginx
-  systemctl restart php-fpm
-  systemctl status nginx
-  systemctl status php-fpm
-  chown -R nginx:nginx /var/run/php-fpm/
-  chown -R nginx:nginx /var/lib/php/session/
-  exit;
-elif [ "$selected" == 'cnp' ]; then
-  systemctl status nginx
-  systemctl status php-fpm
-  exit;
-elif [ "$selected" == 'rpo' ]; then
-  systemctl restart postfix
-  systemctl restart opendkim
-  systemctl status postfix
-  systemctl status opendkim
-  exit;
-elif [ "$selected" == 'cpo' ]; then
-  systemctl status postfix
-  systemctl status opendkim
-  exit;
-fi;
-
-EOF
+wget -P /usr/sbin/ https://raw.githubusercontent.com/NBY/tools/master/tools/panel 
 chmod +x /usr/sbin/panel
+
 mkdir /root/backup
 mkdir /root/tools
 mkdir /root/tmp
@@ -266,7 +233,7 @@ EOF
 chmod +x /root/tools/backup.sh
 systemctl enable crond
 systemctl start crond
-wget -P /usr/sbin/ https://raw.githubusercontent.com/NBY/tools/master/tools/vhost /usr/sbin/vhost
+wget -P /usr/sbin/ https://raw.githubusercontent.com/NBY/tools/master/tools/vhost 
 chmod +x /usr/sbin/vhost
 echo -e "\033[46mneed set mysql mysql_secure_installation\nset dropbox key! go /root/dropbox_uploader.sh info\ncrontab -e [0 5 * * * /bin/bash /root/tools/backup.sh]\npanel and vhost command can help you \033[0m"
 
