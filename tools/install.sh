@@ -65,21 +65,21 @@ systemctl start firewalld.service
 firewall-cmd --permanent --zone=public --add-service=http;
 firewall-cmd --permanent --zone=public --add-service=https;
 firewall-cmd --reload;
-echo -e "\033[46m [Notice] move mysql to /home \033[0m"
-systemctl stop mysqld.service;
+#echo -e "\033[46m [Notice] move mysql to /home \033[0m"
+#systemctl stop mysqld.service;
 
-mv /var/lib/mysql /home/
-mkdir /home/log
-touch /home/log/mysqld.log
-chown -R mysql:mysql /home/mysql
-chown -R mysql:mysql /home/log
-chmod u+w,-x,o-w-r /home/log/mysqld.log
-chmod 777 /home/log/mysqld.log
-sed -i 's:datadir=/var/lib/mysql:datadir=/home/mysql:g' /etc/my.cnf
-sed -i 's:socket=/var/lib/mysql/mysql.sock:socket=/home/mysql/mysql.sock:g' /etc/my.cnf
-sed -i 's:log-error=/var/log/mysqld.log:log-error=/home/log/mysqld.log:g' /etc/my.cnf
-sed -i '$a [client]' /etc/my.cnf
-sed -i '$a socket=/user/mysql/mysql.sock' /etc/my.cnf
+#mv /var/lib/mysql /home/
+#mkdir /home/log
+#touch /home/log/mysqld.log
+#chown -R mysql:mysql /home/mysql
+#chown -R mysql:mysql /home/log
+#chmod u+w,-x,o-w-r /home/log/mysqld.log
+#chmod 777 /home/log/mysqld.log
+#sed -i 's:datadir=/var/lib/mysql:datadir=/home/mysql:g' /etc/my.cnf
+#sed -i 's:socket=/var/lib/mysql/mysql.sock:socket=/home/mysql/mysql.sock:g' /etc/my.cnf
+#sed -i 's:log-error=/var/log/mysqld.log:log-error=/home/log/mysqld.log:g' /etc/my.cnf
+#sed -i '$a [client]' /etc/my.cnf
+#sed -i '$a socket=/user/mysql/mysql.sock' /etc/my.cnf
 systemctl start mysqld.service;
 
 systemctl status mysqld.service;
