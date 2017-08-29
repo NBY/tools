@@ -1,6 +1,11 @@
 #!/bin/bash
 yum install libsodium git fail2ban -y
 git clone -b manyuser https://github.com/ToyoDAdoubi/shadowsocksr.git
+cd shadowsocksr
+bash setup_cymysql.sh
+bash initcfg.sh
+firewall-cmd --zone=public --permanent --add-service=mysql
+firewall-cmd --reload
 ulimit -n 51200 && echo ulimit -n 51200 >> /etc/rc.local
 echo "bash /root/shadowsocksr/run.sh" >> /etc/rc.local
 echo "* soft nofile 51200" >> /etc/security/limits.conf
