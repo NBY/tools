@@ -31,7 +31,7 @@ wget -P /etc/yum.repos.d/ https://raw.githubusercontent.com/NBY/tools/master/too
 yum clean all
 yum makecache
 echo -e "\033[46m [Notice] install service \033[0m"
-yum install -y nginx mysql-community-server php php-opcache php-pecl-apcu php-devel php-mbstring php-mcrypt php-mysqlnd php-json php-phpunit-PHPUnit php-pecl-xdebug php-pecl-xhprof php-pdo php-pdo_dblib php-pear php-fpm php-cli php-xml php-bcmath php-process php-gd php-common php-pecl-zip php-recode php-snmp php-soap memcached libmemcached libmemcached-devel php-pecl-memcached redis php-pecl-redis ImageMagick ImageMagick-devel php-pecl-imagick
+yum install -y vnstat nginx mysql-community-server php php-opcache php-pecl-apcu php-devel php-mbstring php-mcrypt php-mysqlnd php-json php-phpunit-PHPUnit php-pecl-xdebug php-pecl-xhprof php-pdo php-pdo_dblib php-pear php-fpm php-cli php-xml php-bcmath php-process php-gd php-common php-pecl-zip php-recode php-snmp php-soap memcached libmemcached libmemcached-devel php-pecl-memcached redis php-pecl-redis ImageMagick ImageMagick-devel php-pecl-imagick
 sed -i '4a return 500;' /etc/nginx/conf.d/default.conf
 sed -i "/^return/ s/^/    / " /etc/nginx/conf.d/default.conf
 sed -i '23a server_tokens off;' /etc/nginx/nginx.conf
@@ -55,6 +55,9 @@ sed -i 's:group = apache:group = nginx:g' /etc/php-fpm.d/www.conf
 sed -i 's:;listen.owner = nobody:listen.owner = nobody:g' /etc/php-fpm.d/www.conf
 sed -i 's:;listen.group = nobody:listen.group = nobody:g' /etc/php-fpm.d/www.conf
 echo -e "\033[46m [Notice] Start service \033[0m"
+vnstat -u -i eth0
+systemctl enable vnstat
+systemctl start vnstat
 systemctl disable httpd 
 systemctl stop httpd
 systemctl enable mysqld.service;
