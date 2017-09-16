@@ -1,5 +1,8 @@
 #!/bin/bash
-yum install libsodium git fail2ban -y
+yum install libsodium git fail2ban vnstat -y
+vnstat -u -i eth0
+systemctl enable vnstat
+systemctl start vnstat
 git clone -b manyuser https://github.com/ToyoDAdoubi/shadowsocksr.git
 cd shadowsocksr
 bash setup_cymysql.sh
