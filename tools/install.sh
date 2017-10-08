@@ -23,7 +23,7 @@ ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime;
 echo -e "\033[46m [Notice] install epel remi nginx repo \033[0m"
 rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
 rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
-rpm -Uvh http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+#rpm -Uvh http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
 rm /etc/yum.repos.d/remi.repo -f
 
 wget -P /etc/yum.repos.d/ https://raw.githubusercontent.com/NBY/tools/master/tools/remi.repo 
@@ -31,7 +31,8 @@ wget -P /etc/yum.repos.d/ https://raw.githubusercontent.com/NBY/tools/master/too
 yum clean all
 yum makecache
 echo -e "\033[46m [Notice] install service \033[0m"
-yum install -y vnstat nginx mysql-community-server php php-opcache php-pecl-apcu php-devel php-mbstring php-mcrypt php-mysqlnd php-json php-phpunit-PHPUnit php-pecl-xdebug php-pecl-xhprof php-pdo php-pdo_dblib php-pear php-fpm php-cli php-xml php-bcmath php-process php-gd php-common php-pecl-zip php-recode php-snmp php-soap memcached libmemcached libmemcached-devel php-pecl-memcached redis php-pecl-redis ImageMagick ImageMagick-devel php-pecl-imagick
+yum install -y vnstat nginx php php-opcache php-pecl-apcu php-devel php-mbstring php-mcrypt php-mysqlnd php-json php-phpunit-PHPUnit php-pecl-xdebug php-pecl-xhprof php-pdo php-pdo_dblib php-pear php-fpm php-cli php-xml php-bcmath php-process php-gd php-common php-pecl-zip php-recode php-snmp php-soap memcached libmemcached libmemcached-devel php-pecl-memcached redis php-pecl-redis ImageMagick ImageMagick-devel php-pecl-imagick
+#yum install -y mysql-community-server
 sed -i '4a return 500;' /etc/nginx/conf.d/default.conf
 sed -i "/^return/ s/^/    / " /etc/nginx/conf.d/default.conf
 sed -i '23a server_tokens off;' /etc/nginx/nginx.conf
@@ -48,7 +49,6 @@ sed -i 's:;cgi.fix_pathinfo=1:cgi.fix_pathinfo=0:g' /etc/php.ini
 sed -i 's:;date.timezone =:date.timezone = "Asia/Hong_Kong":g' /etc/php.ini
 sed -i 's:; max_input_vars = 1000:max_input_vars = 10000:g' /etc/php.ini
 sed -i 's@;open_basedir =@open_basedir = /data/wwwroot/:/tmp/:/proc/@g' /etc/php.ini
-sed -i 's:pdo_mysql.default_socket=:pdo_mysql.default_socket=/var/lib/mysql/mysql.sock:g' /etc/php.ini
 sed -i 's@listen = 127.0.0.1:9000@listen = /var/run/php-fpm/php-fpm.sock@g' /etc/php-fpm.d/www.conf
 sed -i 's:user = apache:user = nginx:g' /etc/php-fpm.d/www.conf
 sed -i 's:group = apache:group = nginx:g' /etc/php-fpm.d/www.conf
@@ -83,54 +83,16 @@ firewall-cmd --reload;
 #sed -i 's:log-error=/var/log/mysqld.log:log-error=/home/log/mysqld.log:g' /etc/my.cnf
 #sed -i '$a [client]' /etc/my.cnf
 #sed -i '$a socket=/user/mysql/mysql.sock' /etc/my.cnf
-systemctl start mysqld.service;
+#sed -i 's:pdo_mysql.default_socket=:pdo_mysql.default_socket=/var/lib/mysql/mysql.sock:g' /etc/php.ini
+#systemctl start mysqld.service;
 
-systemctl status mysqld.service;
+#systemctl status mysqld.service;
 systemctl start php-fpm.service;
 systemctl start nginx.service;
 mkdir -p /var/lib/php/session
 chown -R nginx:nginx /var/lib/php/session/
 chown -R nginx:nginx /var/run/php-fpm/
 echo -e "\033[46m [Notice] lnmp successful \033[0m"
-echo -e "\033[46m [Notice] install postfix opendkim \033[0m"
-yum install -y postfix opendkim mailx
-sed -i "s/#myhostname = virtual.domain.tld/myhostname = `hostname -f`/g" /etc/postfix/main.cf
-sed -i "s/#mydomain = domain.tld/mydomain = `hostname -f`/g" /etc/postfix/main.cf
-sed -i 's:inet_interfaces = localhost:inet_interfaces = all:g' /etc/postfix/main.cf
-sed -i 's:inet_protocols = all:inet_protocols = ipv4:g' /etc/postfix/main.cf
-sed -i 's:mydestination =:#mydestination =:g' /etc/postfix/main.cf
-sed -i 's:#relay_domains = $mydestination:relay_domains = $mydomain:g' /etc/postfix/main.cf
-sed -i 's:#myorigin = $mydomain:myorigin = $mydomain:g' /etc/postfix/main.cf
-
-rm /etc/opendkim.conf -rf
-wget -P /etc/ https://raw.githubusercontent.com/NBY/tools/master/tools/opendkim.conf
-
-mkdir -p /etc/opendkim/keys/`hostname -f`
-opendkim-genkey -D /etc/opendkim/keys/`hostname -f`/ -d `hostname -f` -s default
-chown opendkim:opendkim -R /etc/opendkim/
-chmod -R 700 /etc/opendkim
-echo "default._domainkey.`hostname -f` `hostname -f`:default:/etc/opendkim/keys/`hostname -f`/default.private" >> /etc/opendkim/KeyTable
-echo "*@`hostname -f` default._domainkey.`hostname -f`" >> /etc/opendkim/SigningTable
-echo "localhost" >> /etc/opendkim/TrustedHosts
-echo "`hostname -f`" >> /etc/opendkim/TrustedHosts
-cat >> /etc/postfix/main.cf<<EOF
-mynetworks = 127.0.0.0/8
-home_mailbox = Maildir/
-mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain, mail.$mydomain, www.$mydomain, ftp.$mydomain
-#DKIM
-milter_default_action = accept
-milter_protocol = 2
-smtpd_milters = inet:8891
-non_smtpd_milters = inet:8891
-EOF
-hash -r
-systemctl enable postfix
-systemctl start postfix
-systemctl enable opendkim
-systemctl start opendkim
-cp /etc/opendkim/keys/`hostname -f`/default.txt /root/`hostname -f`-dkim-signature_default.txt
-echo -e "\033[46m open '/root/`hostname -f`-dkim-signature_default.txt', then add the TXT record to you DNS resolution system. \033[0m"
-echo -e "\033[46m [Notice] install postfix opendkim successful \033[0m"
 
 wget -P /usr/sbin/ https://raw.githubusercontent.com/NBY/tools/master/tools/panel 
 chmod +x /usr/sbin/panel
@@ -141,7 +103,7 @@ mkdir /root/tmp
 cat > /root/tools/backup.sh<<EOF
 #!/bin/bash
 SCRIPT_DIR="/usr/sbin" #这个改成你存放刚刚下载下来的dropbox_uploader.sh的文件夹位置
-DROPBOX_DIR="/root/backup" #这个改成你的备份文件想要放在Dropbox下面的文件夹名称，如果不存在，脚本会自动创建
+DROPBOX_DIR="/" #这个改成你的备份文件想要放在Dropbox下面的文件夹名称，如果不存在，脚本会自动创建
 BACKUP_SRC="/home /etc/nginx/conf.d" #这个是你想要备份的本地VPS上的文件，不同的目录用空格分开
 BACKUP_DST="/root/tmp" #这个是你暂时存放备份压缩文件的地方，一般用/tmp即可
 MYSQL_SERVER="localhost" #这个是你mysql服务器的地址，一般填这个本地地址即可
