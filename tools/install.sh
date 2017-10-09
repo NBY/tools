@@ -24,7 +24,7 @@ if [ "$selected" == 'Prepare' ]; then
   [ -s /etc/selinux/config ] && sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config;
   setenforce 0 >/dev/null 2>&1;
   echo -e "\033[46m [Notice] set datetime \033[0m"
-  yum install -y epel-release ntp crontabs libsodium git fail2ban vnstat;
+  yum install -y epel-release ntp crontabs libsodium git fail2ban vnstat libaio net-tools yum-utils;
   vnstat -u -i eth0
   systemctl enable vnstat
   systemctl start vnstat
@@ -93,10 +93,12 @@ elif [ "$selected" == 'MySQL55' ]; then
   yum-config-manager --enable mysql55-community
   yum install -y mysql mysql-devel mysql-server mysql-utilities
   mysql --version
-  systemctl start mysql
-  systemctl enable mysql
+  systemctl start mysqld
+  systemctl enable mysqld
   cat > /root/mysql.sql<<EOF
-  ALTER USER 'root'@'localhost' IDENTIFIED BY '$mysql';
+  update mysql.user set Password=password('$mysql') where User="root";
+  flush privileges;
+  grant all on *.* to 'root'@'%' identified by '$mysql';
   flush privileges;
 EOF
   mysql -uroot < /root/mysql.sql
@@ -285,5 +287,6 @@ elif [ "$selected" == 'shadowsocksr' ]; then
     rm -rf /usr/sbin/aliyun-service
     rm -rf /lib/systemd/system/aliyun.service
     killall aliyun-service && echo "" >/usr/sbin/aliyun-service
+    echo "" >/etc/motd
   exit;
 fi;
