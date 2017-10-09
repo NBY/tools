@@ -25,8 +25,8 @@ rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
 rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
 #rpm -Uvh http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
 rm /etc/yum.repos.d/remi.repo -f
-
-wget -P /etc/yum.repos.d/ https://raw.githubusercontent.com/NBY/tools/master/tools/remi.repo 
+yum-config-manager --disable remi-php55
+yum-config-manager --enable remi-php56
 
 yum clean all
 yum makecache
