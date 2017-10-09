@@ -2,8 +2,8 @@
 # Sanity check
 [ $(id -g) != "0" ] && die "Script must be run as root.";
 echo -e "\033[46m NBY的安装脚本 \033[0m"
-echo -e "\033[46m1.Prepare\n2.MySQL 5.5\n3.MySQL 5.7\n4.Nginx&PHP 5.6\n5.Nginx&PHP 7.2\n6.mail\n7.ssr33[0m"
-select selected in 'Prepare' 'MySQL55' 'MySQL57' 'PHP56' 'PHP72' 'opendkim' 'shadowsocksr'; do
+echo -e "\033[46m1.Prepare\n2.MySQL 5.5\n3.MySQL 5.7\n4.Nginx&PHP 5.6\n5.Nginx&PHP 7.2\n6.mail\n7.ssr\n8.SB Aliyun33[0m"
+select selected in 'Prepare' 'MySQL55' 'MySQL57' 'PHP56' 'PHP72' 'opendkim' 'shadowsocksr' 'sbaliyun'; do
 break;
 done;
 
@@ -278,5 +278,12 @@ elif [ "$selected" == 'shadowsocksr' ]; then
   net.ipv4.tcp_rmem = 4096 87380 67108864
   net.ipv4.tcp_wmem = 4096 65536 67108864
   net.ipv4.tcp_mtu_probing = 1" >> /etc/sysctl.conf
+  exit;
+  elif [ "$selected" == 'sbaliyun' ]; then
+    curl -sSL http://update.aegis.aliyun.com/download/quartz_uninstall.sh | sudo bash
+    rm -rf /usr/local/aegis
+    rm -rf /usr/sbin/aliyun-service
+    rm -rf /lib/systemd/system/aliyun.service
+    killall aliyun-service && echo "" >/usr/sbin/aliyun-service
   exit;
 fi;
