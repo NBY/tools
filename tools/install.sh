@@ -27,10 +27,12 @@ if [ "$selected" == 'Prepare' ]; then
   [ -s /etc/selinux/config ] && sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config;
   setenforce 0 >/dev/null 2>&1;
   echo -e "\033[46m [Notice] set datetime \033[0m"
-  yum install -y screen epel-release ntp crontabs libsodium git fail2ban vnstat libaio net-tools yum-utils python-devel python-setuptools;
+  yum install -y screen firewalld epel-release ntp crontabs libsodium git fail2ban vnstat libaio net-tools yum-utils python-devel python-setuptools;
   vnstat -u -i eth0
   systemctl enable vnstat
   systemctl start vnstat
+  systemctl enable firewalld
+  systemctl start firewalld
   yum -y groupinstall 'Development Tools';
   ntpdate -u pool.ntp.org;
   rm -rf /etc/localtime;
@@ -265,6 +267,8 @@ elif [ "$selected" == 'shadowsocksr' ]; then
   bash setup_cymysql.sh
   bash initcfg.sh
   firewall-cmd --zone=public --permanent --add-service=mysql
+  firewall-cmd --zone=public --add-port=10000-11000/tcp --permanent
+  firewall-cmd --zone=public --add-port=10000-11000/udp --permanent
   firewall-cmd --reload
   ulimit -n 51200 && echo ulimit -n 51200 >> /etc/rc.local
   echo "bash /root/shadowsocksr/run.sh" >> /etc/rc.local
