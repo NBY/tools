@@ -103,6 +103,8 @@ EOF
 elif [ "$selected" == 'MySQL55' ]; then
   echo -e "\033[46m input mysql keys \033[0m"
   read mysql
+  echo -e "\033[46m input remote ip (%) \033[0m"
+  read remoteIP
   yum remove -y mysql* mariadb*
   rpm -Uvh http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
   yum clean all
@@ -117,7 +119,7 @@ elif [ "$selected" == 'MySQL55' ]; then
   cat > /root/mysql.sql<<EOF
   update mysql.user set Password=password('$mysql') where User="root";
   flush privileges;
-  grant all on *.* to 'root'@'%' identified by '$mysql';
+  GRANT ALL PRIVILEGES ON *.* TO 'root'@'$remoteIP' IDENTIFIED BY '$mysql' WITH GRANT OPTION;   
   flush privileges;
 EOF
   mysql -uroot < /root/mysql.sql
