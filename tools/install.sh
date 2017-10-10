@@ -112,7 +112,7 @@ elif [ "$selected" == 'MySQL55' ]; then
   yum-config-manager --disable mysql57-community-dmr
   yum-config-manager --disable mysql56-community
   yum-config-manager --enable mysql55-community
-  yum install -y mysql mysql-devel mysql-server mysql-utilities
+  yum install -y mysql mysql-devel mysql-server mysql-utilities fail2ban
   mysql --version
   systemctl start mysqld
   systemctl enable mysqld
