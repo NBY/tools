@@ -46,6 +46,10 @@ if [ "$selected" == 'Prepare' ]; then
   systemctl start vnstat
   systemctl enable firewalld
   systemctl start firewalld
+  firewall-cmd --permanent --zone=public --add-service=http;
+  firewall-cmd --permanent --zone=public --add-service=https;
+  firewall-cmd --permanent --zone=public --add-service=mysql;
+  firewall-cmd --reload;
   yum -y groupinstall 'Development Tools';
   ntpdate -u pool.ntp.org;
   rm -rf /etc/localtime;
@@ -177,11 +181,6 @@ elif [ "$selected" == 'PHP56' ]; then
   echo -e "\033[46m [Notice] Start service \033[0m"
   systemctl enable php-fpm.service;
   systemctl enable nginx.service;
-  systemctl enable firewalld.service;
-  systemctl start firewalld.service
-  firewall-cmd --permanent --zone=public --add-service=http;
-  firewall-cmd --permanent --zone=public --add-service=https;
-  firewall-cmd --reload;
   systemctl start php-fpm.service;
   systemctl start nginx.service;
   mkdir -p /var/lib/php/session
@@ -221,11 +220,6 @@ elif [ "$selected" == 'PHP72' ]; then
   echo -e "\033[46m [Notice] Start service \033[0m"
   systemctl enable php-fpm.service;
   systemctl enable nginx.service;
-  systemctl enable firewalld.service;
-  systemctl start firewalld.service
-  firewall-cmd --permanent --zone=public --add-service=http;
-  firewall-cmd --permanent --zone=public --add-service=https;
-  firewall-cmd --reload;
   systemctl start php-fpm.service;
   systemctl start nginx.service;
   mkdir -p /var/lib/php/session
@@ -281,7 +275,6 @@ elif [ "$selected" == 'shadowsocksr' ]; then
   cd shadowsocksr
   bash setup_cymysql.sh
   bash initcfg.sh
-  firewall-cmd --zone=public --permanent --add-service=mysql
   firewall-cmd --zone=public --add-port=10000-11000/tcp --permanent
   firewall-cmd --zone=public --add-port=10000-11000/udp --permanent
   firewall-cmd --reload
