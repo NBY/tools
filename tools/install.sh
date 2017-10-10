@@ -27,7 +27,7 @@ if [ "$selected" == 'Prepare' ]; then
   [ -s /etc/selinux/config ] && sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config;
   setenforce 0 >/dev/null 2>&1;
   echo -e "\033[46m [Notice] set datetime \033[0m"
-  yum install -y epel-release ntp crontabs libsodium git fail2ban vnstat libaio net-tools yum-utils;
+  yum install -y screen epel-release ntp crontabs libsodium git fail2ban vnstat libaio net-tools yum-utils;
   vnstat -u -i eth0
   systemctl enable vnstat
   systemctl start vnstat
