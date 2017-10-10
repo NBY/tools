@@ -301,6 +301,7 @@ elif [ "$selected" == 'shadowsocksr' ]; then
   net.ipv4.tcp_rmem = 4096 87380 67108864
   net.ipv4.tcp_wmem = 4096 65536 67108864
   net.ipv4.tcp_mtu_probing = 1" >> /etc/sysctl.conf
+  sysctl -p
   exit;
   elif [ "$selected" == 'sbaliyun' ]; then
     curl -sSL http://update.aegis.aliyun.com/download/quartz_uninstall.sh | sudo bash
