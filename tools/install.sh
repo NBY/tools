@@ -53,7 +53,7 @@ if [ "$selected" == 'Prepare' ]; then
   #!/bin/bash
   SCRIPT_DIR="/usr/sbin" #这个改成你存放刚刚下载下来的dropbox_uploader.sh的文件夹位置
   DROPBOX_DIR="/" #这个改成你的备份文件想要放在Dropbox下面的文件夹名称，如果不存在，脚本会自动创建
-  BACKUP_SRC="/home /etc/nginx/conf.d" #这个是你想要备份的本地VPS上的文件，不同的目录用空格分开
+  BACKUP_SRC="/home /etc/nginx/conf.d /etc/php-fpm.d" #这个是你想要备份的本地VPS上的文件，不同的目录用空格分开
   BACKUP_DST="/root/tmp" #这个是你暂时存放备份压缩文件的地方，一般用/tmp即可
   MYSQL_SERVER="localhost" #这个是你mysql服务器的地址，一般填这个本地地址即可
   MYSQL_USER="root" #这个是你mysql的用户名名称，比如root或admin之类的
