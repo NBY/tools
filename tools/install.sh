@@ -154,6 +154,9 @@ elif [ "$selected" == 'PHP56' ]; then
   sed -i 's:group = apache:group = nginx:g' /etc/php-fpm.d/www.conf
   sed -i 's:;listen.owner = nobody:listen.owner = nobody:g' /etc/php-fpm.d/www.conf
   sed -i 's:;listen.group = nobody:listen.group = nobody:g' /etc/php-fpm.d/www.conf
+  wget /usr/lib64/php/modules https://raw.githubusercontent.com/engineyard/php-ioncube-loader/master/ioncube/ioncube_loader_lin_5.6.so
+  sed -i "\$a [ionCube Loader]" /etc/php.ini
+  sed -i "\$a zend_extension = /usr/lib64/php/modules/ioncube_loader_lin_5.6.so" /etc/php.ini
   echo -e "\033[46m [Notice] Start service \033[0m"
   systemctl enable php-fpm.service;
   systemctl enable nginx.service;
