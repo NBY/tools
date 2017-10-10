@@ -275,6 +275,8 @@ elif [ "$selected" == 'shadowsocksr' ]; then
   cd shadowsocksr
   bash setup_cymysql.sh
   bash initcfg.sh
+  rm user-config.json -rf
+  rm usermysql.json -rf
   firewall-cmd --zone=public --add-port=10000-11000/tcp --permanent
   firewall-cmd --zone=public --add-port=10000-11000/udp --permanent
   firewall-cmd --reload
