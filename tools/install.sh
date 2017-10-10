@@ -105,14 +105,13 @@ elif [ "$selected" == 'MySQL55' ]; then
   read mysql
   echo -e "\033[46m input remote ip (%) \033[0m"
   read remoteIP
-  yum remove -y mysql* mariadb*
   rpm -Uvh http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
   yum clean all
   yum makecache
   yum-config-manager --disable mysql57-community-dmr
   yum-config-manager --disable mysql56-community
   yum-config-manager --enable mysql55-community
-  yum install -y mysql mysql-devel mysql-server mysql-utilities fail2ban
+  yum install -y mysql mysql-devel mysql-server mysql-utilities
   mysql --version
   systemctl start mysqld
   systemctl enable mysqld
