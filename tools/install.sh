@@ -82,6 +82,7 @@ EOF
   wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh
   chmod +x bbr.sh
   sh /root/bbr.sh
+  rm /root/bbr.sh
   echo -e "\033[46mneed set mysql mysql_secure_installation\nset dropbox key\ncrontab -e [0 5 * * * /bin/bash /root/tools/backup.sh]\033[0m"
   exit;
 elif [ "$selected" == 'MySQL55' ]; then
