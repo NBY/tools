@@ -1,0 +1,12 @@
+[Unit]
+Description=ShadowSocksR
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/root/shadowsocksr/run.sh start
+ExecStop=/root/shadowsocksr/stop.sh stop
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
