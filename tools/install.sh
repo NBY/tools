@@ -8,11 +8,12 @@ break;
 done;
 
 if [ "$selected" == 'Prepare' ]; then
+  echo -e "\033[46m Make sure you had set ssh key!Now will cloused password login! \033[0m"
+  echo -e "\033[46m set hostname \033[0m"
+  read newhostname
   echo -e "\033[46m Closed ssh password login \033[0m"
   sed -i 's:PasswordAuthentication yes:PasswordAuthentication no:g' /etc/ssh/sshd_config
   systemctl restart sshd
-  echo -e "\033[46m set hostname \033[0m"
-  read newhostname
   hostname $newhostname
   echo "$newhostname" > /proc/sys/kernel/hostname
   sysctl kernel.hostname=$newhostname
