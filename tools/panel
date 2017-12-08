@@ -36,5 +36,7 @@ elif [ "$selected" == 'AddPort' ]; then
   firewall-cmd --permanent --add-port=$AddPort/tcp
   firewall-cmd --permanent --add-port=$AddPort/udp
   firewall-cmd --reload
+  echo -e "\033[46m 以下是打开的端口 \033[0m"
+  firewall-cmd --list-all
   exit;
 fi;
