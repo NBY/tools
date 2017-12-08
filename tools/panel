@@ -2,8 +2,8 @@
 # Sanity check
 [ $(id -g) != "0" ] && die "Script must be run as root.";
 echo -e "\033[46m Nginx PHP Mail Manage \033[0m"
-echo -e "\033[46m1.restart nginx&php-fpm\n2.check nginx&php-fpm status\n3.restart postfix&opendkim\n4.check postfix&opendkim\n5.add port\033[0m"
-select selected in 'rnp' 'cnp' 'rpo' 'cpo' 'AddPort'; do
+echo -e "\033[46m1.restart nginx&php-fpm\n2.check nginx&php-fpm status\n3.restart postfix&opendkim\n4.check postfix&opendkim\n5.add port\n6.List Firewall Info \033[0m"
+select selected in 'rnp' 'cnp' 'rpo' 'cpo' 'AddPort' 'ListFirewall'; do
 break;
 done;
 
@@ -36,6 +36,10 @@ elif [ "$selected" == 'AddPort' ]; then
   firewall-cmd --permanent --add-port=$AddPort/tcp
   firewall-cmd --permanent --add-port=$AddPort/udp
   firewall-cmd --reload
+  echo -e "\033[46m 以下是打开的端口 \033[0m"
+  firewall-cmd --list-all
+  exit;
+elif [ "$selected" == 'ListFirewall' ]; then
   echo -e "\033[46m 以下是打开的端口 \033[0m"
   firewall-cmd --list-all
   exit;
