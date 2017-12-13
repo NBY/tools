@@ -2,8 +2,8 @@
 # Sanity check
 [ $(id -g) != "0" ] && die "Script must be run as root.";
 echo -e "\033[46m Nginx PHP Mail Manage \033[0m"
-echo -e "\033[46m1.restart nginx&php-fpm\n2.check nginx&php-fpm status\n3.restart postfix&opendkim\n4.check postfix&opendkim\n5.add port\n6.List Firewall Info \033[0m"
-select selected in 'rnp' 'cnp' 'rpo' 'cpo' 'AddPort' 'ListFirewall'; do
+echo -e "\033[46m1.Restart Nginx&PHP-FPM\n2.Check Nginx&PHP-FPM Status\n3.Restart Postfix&Opendkim\n4.Check Postfix&Opendkim\n5.Add Firewall Port\n6.Remove Firewall Port\n7.List Firewall Info \033[0m"
+select selected in 'rnp' 'cnp' 'rpo' 'cpo' 'AddFirewallPort' 'RemoveFirewallPort' 'ListFirewall'; do
 break;
 done;
 
@@ -30,11 +30,20 @@ elif [ "$selected" == 'cpo' ]; then
   systemctl status postfix
   systemctl status opendkim
   exit;
-elif [ "$selected" == 'AddPort' ]; then
+elif [ "$selected" == 'AddFirewallPort' ]; then
   echo -e "\033[46m 设定要开启的端口 \033[0m"
-  read AddPort
-  firewall-cmd --permanent --add-port=$AddPort/tcp
-  firewall-cmd --permanent --add-port=$AddPort/udp
+  read AddFirewallPort
+  firewall-cmd --permanent --add-port=$AddFirewallPort/tcp
+  firewall-cmd --permanent --add-port=$AddFirewallPort/udp
+  firewall-cmd --reload
+  echo -e "\033[46m 以下是打开的端口 \033[0m"
+  firewall-cmd --list-all
+  exit;
+elif [ "$selected" == 'RemoveFirewallPort' ]; then
+  echo -e "\033[46m 设定要关闭的端口 \033[0m"
+  read RemoveFirewallPort
+  firewall-cmd --permanent --add-port=$RemoveFirewallPort/tcp
+  firewall-cmd --permanent --add-port=$RemoveFirewallPort/udp
   firewall-cmd --reload
   echo -e "\033[46m 以下是打开的端口 \033[0m"
   firewall-cmd --list-all
