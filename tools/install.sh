@@ -3,7 +3,7 @@
 [ $(id -g) != "0" ] && die "Script must be run as root.";
 echo -e "\033[46m NBY的安装脚本 \033[0m"
 echo -e "\033[46m1.Prepare\n2.MySQL 5.5\n3.MySQL 5.7\n4.Nginx&PHP 5.6\n5.Nginx&PHP 7.2\n6.mail\n7.ssr\n8.SB Aliyun33[0m"
-select selected in 'Prepare' 'MySQL55' 'MySQL57' 'PHP56' 'PHP72' 'opendkim' 'shadowsocksr' 'sbaliyun'; do
+select selected in 'Prepare' 'MySQL55' 'MySQL57' 'PHP56' 'PHP72' 'mail' 'shadowsocksr' 'sbaliyun'; do
 break;
 done;
 
@@ -228,7 +228,7 @@ elif [ "$selected" == 'PHP72' ]; then
   chown -R nginx:nginx /var/run/php-fpm/  
   echo -e "\033[46m [Notice]Ningx PHP7.2 Install Successful! \033[0m"
   exit;
-elif [ "$selected" == 'opendkim' ]; then
+elif [ "$selected" == 'mail' ]; then
   echo -e "\033[46m [Notice] install postfix opendkim \033[0m"
   yum install -y postfix opendkim mailx
   sed -i "s/#myhostname = virtual.domain.tld/myhostname = `hostname -f`/g" /etc/postfix/main.cf
@@ -251,14 +251,14 @@ elif [ "$selected" == 'opendkim' ]; then
   echo "localhost" >> /etc/opendkim/TrustedHosts
   echo "`hostname -f`" >> /etc/opendkim/TrustedHosts
   cat >> /etc/postfix/main.cf<<EOF
-  mynetworks = 127.0.0.0/8
-  home_mailbox = Maildir/
-  mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain, mail.$mydomain, www.$mydomain, ftp.$mydomain
-  #DKIM
-  milter_default_action = accept
-  milter_protocol = 2
-  smtpd_milters = inet:8891
-  non_smtpd_milters = inet:8891
+mynetworks = 127.0.0.0/8
+home_mailbox = Maildir/
+mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain, mail.$mydomain, www.$mydomain, ftp.$mydomain
+#DKIM
+milter_default_action = accept
+milter_protocol = 2
+smtpd_milters = inet:8891
+non_smtpd_milters = inet:8891
 EOF
   hash -r
   systemctl enable postfix
