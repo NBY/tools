@@ -307,8 +307,8 @@ elif [ "$selected" == 'shadowsocksr' ]; then
   chmod 755 /lib/systemd/system/shadowsocks.service
   systemctl enable shadowsocks.service
   exit;
-  elif [ "$selected" == 'sbaliyun' ]; then
-    curl -sSL http://update.aegis.aliyun.com/download/quartz_uninstall.sh | sudo bash
+elif [ "$selected" == 'sbaliyun' ]; then
+    curl -sSL https://raw.githubusercontent.com/NBY/tools/master/tools/quartz_uninstall.sh | sudo bash
     rm -rf /usr/local/aegis
     rm -rf /usr/sbin/aliyun-service
     rm -rf /lib/systemd/system/aliyun.service
