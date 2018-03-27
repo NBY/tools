@@ -195,7 +195,7 @@ elif [ "$selected" == 'PHP72' ]; then
   yum clean all
   yum makecache
   echo -e "\033[46m [Notice] install service \033[0m"
-  yum install -y nginx php php-opcache php-pecl-apcu php-devel php-mbstring php-mcrypt php-mysqlnd php-json php-phpunit-PHPUnit php-pecl-xdebug php-pecl-xhprof php-pdo php-pdo_dblib php-pear php-fpm php-cli php-xml php-bcmath php-process php-gd php-common php-pecl-zip php-recode php-snmp php-soap memcached libmemcached libmemcached-devel php-pecl-memcached redis php-pecl-redis ImageMagick ImageMagick-devel php-pecl-imagick php-imap
+  yum install -y nginx php php-opcache php-pecl-apcu php-devel php-mbstring php-pecl-mcrypt php-mysqlnd php-json php-phpunit-PHPUnit php-pecl-xdebug  php-pdo php-pdo_dblib php-pear php-fpm php-cli php-xml php-bcmath php-process php-gd php-common php-pecl-zip php-recode php-snmp php-soap memcached libmemcached libmemcached-devel php-pecl-memcached redis php-pecl-redis ImageMagick ImageMagick-devel php-pecl-imagick php-imap
   sed -i '4a return 500;' /etc/nginx/conf.d/default.conf
   sed -i "/^return/ s/^/    / " /etc/nginx/conf.d/default.conf
   sed -i '23a server_tokens off;' /etc/nginx/nginx.conf
@@ -206,6 +206,8 @@ elif [ "$selected" == 'PHP72' ]; then
   sed -i '23a fastcgi_buffers 4 64k;' /etc/nginx/nginx.conf
   sed -i "/^server_tokens/ s/^/    / " /etc/nginx/nginx.conf
   sed -i 's:#gzip  on;:gzip  on;:g' /etc/nginx/nginx.conf
+  #PHP Warning:  Zend OPcache huge_code_pages: madvise(HUGEPAGE) failed: Invalid argument (22) in Unknown on line 0
+  sed -i 's:opcache.huge_code_pages=1:opcache.huge_code_pages=0:g' /etc/php.d/10-opcache.ini
   sed -i 's:short_open_tag = Off:short_open_tag = On:g' /etc/php.ini
   sed -i 's:expose_php = On:expose_php = Off:g' /etc/php.ini
   sed -i 's:;cgi.fix_pathinfo=1:cgi.fix_pathinfo=0:g' /etc/php.ini
