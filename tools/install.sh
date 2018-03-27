@@ -69,7 +69,7 @@ if [ "$selected" == 'Prepare' ]; then
   cd /root
   mkdir /tmp
   mkdir /root/tools
-  cat > /root/tools/backup.sh<<EOF
+  cat > /usr/sbin/backup<<EOF
   #!/bin/bash
   SCRIPT_DIR="/usr/sbin" #这个改成你存放刚刚下载下来的dropbox_uploader.sh的文件夹位置
   DROPBOX_DIR="/" #这个改成你的备份文件想要放在Dropbox下面的文件夹名称，如果不存在，脚本会自动创建
@@ -96,7 +96,7 @@ if [ "$selected" == 'Prepare' ]; then
   # 删除本地的临时文件
   rm -f "\$NOW-Databases.sql" "\$DESTFILE"
 EOF
-  chmod +x /root/tools/backup.sh
+  chmod +x /usr/sbin/backup
   systemctl enable crond
   systemctl start crond
   wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh
