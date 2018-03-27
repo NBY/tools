@@ -131,8 +131,6 @@ EOF
   echo -e "\033[46m [Notice]Install MySQL5.5 Successful! \033[0m"
   exit;
 elif [ "$selected" == 'MySQL57' ]; then
-  echo -e "\033[46m input mysql keys \033[0m"
-  read mysql
   yum remove -y mysql* mariadb*
   rpm -Uvh http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
   yum-config-manager --enable mysql57-community-dmr
@@ -144,7 +142,8 @@ elif [ "$selected" == 'MySQL57' ]; then
   systemctl enable mysql
   echo -e "\033[46mmysql key is $mysql\nneed set mysql mysql_secure_installation\033[0m"
   echo -e "\033[46m [Notice]Install MySQL5.7 Successful! \033[0m"
-  mysql_secure_installation
+  #mysql_secure_installation
+  cat /var/log/mysqld.log | grep "temporary password"
   exit;
 elif [ "$selected" == 'PHP56' ]; then
   yum-config-manager --disable remi-php55
