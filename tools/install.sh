@@ -163,6 +163,8 @@ elif [ "$selected" == 'PHP56' ]; then
   sed -i '23a fastcgi_buffers 4 64k;' /etc/nginx/nginx.conf
   sed -i "/^server_tokens/ s/^/    / " /etc/nginx/nginx.conf
   sed -i 's:#gzip  on;:gzip  on;:g' /etc/nginx/nginx.conf
+  sed -i 's:upload_max_filesize = 2M:upload_max_filesize = 50M:g' /etc/php.ini
+  sed -i 's:post_max_size = 8M:post_max_size = 50M:g' /etc/php.ini
   sed -i 's:short_open_tag = Off:short_open_tag = On:g' /etc/php.ini
   sed -i 's:expose_php = On:expose_php = Off:g' /etc/php.ini
   sed -i 's:;cgi.fix_pathinfo=1:cgi.fix_pathinfo=0:g' /etc/php.ini
@@ -208,6 +210,8 @@ elif [ "$selected" == 'PHP72' ]; then
   sed -i 's:#gzip  on;:gzip  on;:g' /etc/nginx/nginx.conf
   #PHP Warning:  Zend OPcache huge_code_pages: madvise(HUGEPAGE) failed: Invalid argument (22) in Unknown on line 0
   sed -i 's:opcache.huge_code_pages=1:opcache.huge_code_pages=0:g' /etc/php.d/10-opcache.ini
+  sed -i 's:upload_max_filesize = 2M:upload_max_filesize = 50M:g' /etc/php.ini
+  sed -i 's:post_max_size = 8M:post_max_size = 50M:g' /etc/php.ini
   sed -i 's:short_open_tag = Off:short_open_tag = On:g' /etc/php.ini
   sed -i 's:expose_php = On:expose_php = Off:g' /etc/php.ini
   sed -i 's:;cgi.fix_pathinfo=1:cgi.fix_pathinfo=0:g' /etc/php.ini
