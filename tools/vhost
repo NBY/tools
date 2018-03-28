@@ -20,6 +20,7 @@ if [ "$selected" == 'addwww' ]; then
 server {
  listen 80;
  server_name www.$domain;
+ client_max_body_size 50M;
  access_log /home/$domain/log/access.log;
  error_log /home/$domain/log/error.log;
  root /home/$domain/www;
@@ -149,6 +150,7 @@ elif [ "$selected" == 'addxxx' ]; then
 server {
  listen 80;
  server_name $sdomain.$domain;
+ client_max_body_size 50M;
  access_log /home/$sdomain.$domain/log/access.log;
  error_log /home/$sdomain.$domain/log/error.log;
  root /home/$sdomain.$domain/www;
@@ -279,6 +281,7 @@ elif [ "$selected" == 'addpw' ]; then
 server {
  listen 80;
  server_name $sdomain.$domain;
+ client_max_body_size 50M;
  access_log /home/$sdomain.$domain/log/access.log;
  error_log /home/$sdomain.$domain/log/error.log;
  root /home/$sdomain.$domain/www;
