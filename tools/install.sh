@@ -138,12 +138,12 @@ elif [ "$selected" == 'MySQL57' ]; then
   yum-config-manager --disable mysql55-community
   yum install -y mysql mysql-devel mysql-server mysql-utilities
   mysql --version
-  systemctl start mysql
-  systemctl enable mysql
-  echo -e "\033[46mmysql key is $mysql\nneed set mysql mysql_secure_installation\033[0m"
+  systemctl start mysqld
+  systemctl enable mysqld
   echo -e "\033[46m [Notice]Install MySQL5.7 Successful! \033[0m"
-  #mysql_secure_installation
-  cat /var/log/mysqld.log | grep "temporary password"
+  echo -e "\033[46m Mysql Passowrd is:\033[0m"
+  sudo grep 'temporary password' /var/log/mysqld.log 
+  echo -e "\033[46m Change MySQL Password:"ALTER USER 'root'@'localhost' IDENTIFIED BY 'change_new_password';"\033[0m"
   exit;
 elif [ "$selected" == 'PHP56' ]; then
   yum-config-manager --disable remi-php55
