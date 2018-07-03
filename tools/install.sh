@@ -35,7 +35,9 @@ if [ "$selected" == 'Prepare' ]; then
   yum install -y crontabs 
   yum install -y libsodium 
   yum install -y git 
-  yum install -y fail2ban 
+  yum install -y fail2ban
+  systemctl enable fail2ban
+  systemctl start fail2ban
   yum install -y vnstat 
   yum install -y libaio 
   yum install -y net-tools 
