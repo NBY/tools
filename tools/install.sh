@@ -44,6 +44,8 @@ if [ "$selected" == 'Prepare' ]; then
   yum install -y yum-utils 
   yum install -y python-devel 
   yum install -y python-setuptools
+  yum install -y nss
+  yum install -y curl
   vnstat -u -i eth0
   systemctl enable vnstat
   systemctl start vnstat
