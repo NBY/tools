@@ -2,8 +2,8 @@
 # Sanity check
 [ $(id -g) != "0" ] && die "Script must be run as root.";
 echo -e "\033[46m NBY的安装脚本 \033[0m"
-echo -e "\033[46m1.Prepare\n2.MySQL 5.5\n3.MySQL 5.7\n4.Nginx&PHP 5.6\n5.Nginx&PHP 7.2\n6.mail\n7.ssr\n8.SB Aliyun33[0m"
-select selected in 'Prepare' 'MySQL55' 'MySQL57' 'PHP56' 'PHP72' 'mail' 'shadowsocksr' 'sbaliyun'; do
+echo -e "\033[46m1.Prepare\n2.MySQL 5.5\n3.MySQL 5.7\n4.Nginx&PHP 5.6\n5.Nginx&PHP 7.2\n6.mail\n7.fq\n8.SB Aliyun33[0m"
+select selected in 'Prepare' 'MySQL55' 'MySQL57' 'PHP56' 'PHP72' 'mail' 'fq' 'sbaliyun'; do
 break;
 done;
 
@@ -280,9 +280,9 @@ EOF
   echo -e "\033[46m open '/root/`hostname -f`-dkim-signature_default.txt', then add the TXT record to you DNS resolution system. \033[0m"
   echo -e "\033[46m [Notice] install postfix opendkim successful \033[0m"
   exit;
-elif [ "$selected" == 'shadowsocksr' ]; then
-  wget -P /usr/sbin/ https://raw.githubusercontent.com/NBY/tools/master/tools/forward
-  chmod +x /usr/sbin/forward
+elif [ "$selected" == 'fq' ]; then
+  wget -P /usr/sbin/ https://raw.githubusercontent.com/NBY/tools/master/tools/port
+  chmod +x /usr/sbin/port
   git clone -b manyuser https://github.com/ToyoDAdoubi/shadowsocksr.git
   cd shadowsocksr
   bash setup_cymysql.sh
@@ -291,6 +291,8 @@ elif [ "$selected" == 'shadowsocksr' ]; then
   rm usermysql.json -rf
   firewall-cmd --zone=public --add-port=10000-11000/tcp --permanent
   firewall-cmd --zone=public --add-port=10000-11000/udp --permanent
+  firewall-cmd --zone=public --add-port=8300/tcp --permanent
+  firewall-cmd --zone=public --add-port=8300/udp --permanent
   firewall-cmd --reload
   ulimit -n 51200 && echo ulimit -n 51200 >> /etc/rc.local
   echo "bash /root/shadowsocksr/run.sh" >> /etc/rc.local
@@ -316,7 +318,8 @@ elif [ "$selected" == 'shadowsocksr' ]; then
   sysctl -p
   wget -P /lib/systemd/system/ https://raw.githubusercontent.com/NBY/tools/master/tools/shadowsocks.service
   chmod 755 /lib/systemd/system/shadowsocks.service
-  systemctl enable shadowsocks.service
+  bash <(curl -L -s https://install.direct/go.sh)
+  /usr/bin/v2ray/v2ray -version
   exit;
 elif [ "$selected" == 'sbaliyun' ]; then
     curl -sSL https://raw.githubusercontent.com/NBY/tools/master/tools/quartz_uninstall.sh | sudo bash
