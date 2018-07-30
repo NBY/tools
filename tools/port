@@ -61,8 +61,8 @@ elif [ "$selected" == 'AddForwardB' ]; then
   read ForwardIP
   echo -e "\033[46m 设定转发的目标端口 （支持端口段 如2000-3000） \033[0m"
   read ToPort
-  firewall-cmd --permanent --add-forward-port=port=$ForwardPort:proto=tcp:toaddr=$ForwardIP:toport=$ToPort
-  firewall-cmd --permanent --add-forward-port=port=$ForwardPort:proto=udp:toaddr=$ForwardIP:toport=$ToPort
+  firewall-cmd --permanent --add-forward-port=port=$FormPort:proto=tcp:toaddr=$ForwardIP:toport=$ToPort
+  firewall-cmd --permanent --add-forward-port=port=$FormPort:proto=udp:toaddr=$ForwardIP:toport=$ToPort
   firewall-cmd --reload
   firewall-cmd --list-all --zone=public  
   exit;
@@ -75,8 +75,8 @@ elif [ "$selected" == 'RemoveForwardB' ]; then
   read ForwardIP
   echo -e "\033[46m 设定取消转发的目标端口 （支持端口段 如2000-3000） \033[0m"
   read ToPort
-  firewall-cmd --permanent --remove-forward-port=port=$ForwardPort:proto=tcp:toaddr=$ForwardIP:toport=$ToPort
-  firewall-cmd --permanent --remove-forward-port=port=$ForwardPort:proto=udp:toaddr=$ForwardIP:toport=$ToPort
+  firewall-cmd --permanent --remove-forward-port=port=$FormPort:proto=tcp:toaddr=$ForwardIP:toport=$ToPort
+  firewall-cmd --permanent --remove-forward-port=port=$FormPort:proto=udp:toaddr=$ForwardIP:toport=$ToPort
   firewall-cmd --reload
   firewall-cmd --list-all --zone=public  
   exit;
