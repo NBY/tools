@@ -12,7 +12,13 @@
 # Auto transfer backup file to Google Drive (need install gdrive command) (option)
 # Auto transfer backup file to FTP server (option)
 # Auto delete Google Drive's or FTP server's remote file (option)
-#
+# Google Drive Upload Install:
+# apt-get -y install golang git / yum -y install golang git
+# go get github.com/google/skicka
+# sudo mv ~/go/bin/skicka /usr/local/sbin
+# skicka init 
+# skicka -no-browser-auth ls ##授权
+
 
 [[ $EUID -ne 0 ]] && echo "Error: This script must be run as root!" && exit 1
 
